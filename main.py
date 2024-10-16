@@ -6,8 +6,11 @@ class Product:
     def __str__(self):
         return f"{self.nome} - {self.preco:.2f}"
 
-    def __eq__(self, outro):
-        return self.preco == outro.preco and self.nome.lower() == outro.nome.lower()
+    def __lt__(self, outro):
+        return self.nome.lower() < outro.nome.lower()
+
+    def __gt__(self, outro):
+        return self.nome.lower() > outro.nome.lower()
 
 
 
@@ -33,21 +36,26 @@ class LinkedList:
     def add(self, value):
         new_node = Node(value)
 
-        try:
-            if isinstance(value, Product):
-                if self.first_node is None:
-                    self.first_node = (
-                    new_node  # Se a lista estiver vazia, o novo nó é o primeiro
-                )
-                else:
-                    current = self.first_node
-                    while current.next:  # Percorre até o final
-                        if value.nome > current.value.nome and value.nome < current.next.value.nome: #revisar, usar os __gt__, __lt__ p refinar
-                            current.next = new_node# Adiciona o novo nó no final
-                        current = current.next
+        if not isinstance(value, Product):
+            print('Só instâncias de Produto são aceitas.')
+            return
+    
+        if self.first_node is None:
+            self.first_node = new_node  # Se a lista estiver vazia, o novo nó é o primeiro
+        else:
+             if value < self.first_node.value:  # Percorre até o final #revisar, usar os __gt__, __lt__ p refinar
+                new_node.next = self.first_node
+                self.first_node = new_node
+                return
+        
+        current = self.first_node
+        while current.next and value > current.next.value:
+            current = current.next
+            
+        new_node.next = current.next
+        current.next = new_node
                     
-        except Exception: #ideal seria fazer uma exception customizada p lidar com este erro!
-                print('Só instâncias de Produto são aceitas.')
+        
 
     def remove(self, value):
         current = self.first_node
@@ -72,16 +80,22 @@ class LinkedList:
             current = current.next
             result += 1
         return -1  # Indica que o value não foi encontrado
+    
+
 
 
 # Criando uma lista encadeada
 lista = LinkedList()
 
 # Adicionando elementos
-lista.add(10)
-lista.add(20)
-lista.add(5)
-lista.add(30)
+lista.add(Product('d', 1))
+lista.add(Product('a', 1))
+lista.add(Product('e', 1))
+lista.add(Product('b', 1))
+lista.add(Product('c', 1))
+
+print(lista.value)
+""" 
 
 print("Lista:", lista)  # Deve exibir: 10 -> 20 -> 30
 
@@ -92,5 +106,5 @@ print("Lista após remove 20:", lista)  # Deve exibir: 10 -> 30
 # Buscando a posição de um elemento
 position = lista.position(30)
 print(f"Posição de 30: {position}")  # Deve exibir: Posição de 30: 1
-
+ """
 
